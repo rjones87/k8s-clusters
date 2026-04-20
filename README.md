@@ -101,6 +101,8 @@ Check the workloads:
 ```sh
 kubectl get deploy,svc --context kind-dev
 kubectl get deploy,svc --context kind-prod
+kubectl get statefulset,pvc --context kind-dev
+kubectl get statefulset,pvc --context kind-prod
 ```
 
 Access the services locally through Kong:
@@ -122,6 +124,8 @@ Access the Argo CD UIs locally:
 - `bootstrap-argocd-repo-creds.sh` reads the local deploy key and applies the
   Argo CD repository secret to both clusters without storing the private key in
   Git.
+- PostgreSQL is deployed internally in each cluster as a single-replica
+  StatefulSet and is not exposed through Kong.
 - Kong runs in DB-less mode using declarative configuration from
   `workloads/*/kong.yaml`.
 - `install-argocd.sh` patches `argocd-server` to `NodePort` so the UI is
