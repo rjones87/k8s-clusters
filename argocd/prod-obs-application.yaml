@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hello-dev
+  name: prod-obs
   namespace: __ARGOCD_NAMESPACE__
 spec:
   project: default
   source:
     repoURL: __ARGOCD_REPO_URL__
     targetRevision: __ARGOCD_TARGET_REVISION__
-    path: workloads/dev
+    path: workloads/prod/obs
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: observability
   syncPolicy:
     automated:
       prune: true

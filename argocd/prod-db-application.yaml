@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-db
+  namespace: __ARGOCD_NAMESPACE__
+spec:
+  project: default
+  source:
+    repoURL: __ARGOCD_REPO_URL__
+    targetRevision: __ARGOCD_TARGET_REVISION__
+    path: workloads/prod/db
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

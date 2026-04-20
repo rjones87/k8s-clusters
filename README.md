@@ -7,8 +7,12 @@ each cluster through Argo CD.
 
 - `kind-dev.yaml`: `kind` config for the `dev` cluster
 - `kind-prod.yaml`: `kind` config for the `prod` cluster
-- `workloads/dev/hello.yaml`: workload synced into `kind-dev`
-- `workloads/prod/hello.yaml`: workload synced into `kind-prod`
+- `workloads/dev/app/*`: app-tier workloads synced into `dev-app`
+- `workloads/dev/db/*`: db-tier workloads synced into `dev-db`
+- `workloads/dev/obs/*`: observability workloads synced into `dev-obs`
+- `workloads/prod/app/*`: app-tier workloads synced into `prod-app`
+- `workloads/prod/db/*`: db-tier workloads synced into `prod-db`
+- `workloads/prod/obs/*`: observability workloads synced into `prod-obs`
 - `argocd/*.yaml`: Argo CD `Application` templates
 - `bootstrap-argocd-repo-creds.sh`: creates Argo CD repo credentials in both clusters from a local SSH key
 - `install-argocd.sh`: installs Argo CD into both clusters
@@ -117,6 +121,12 @@ Access the Argo CD UIs locally:
 - `https://127.0.0.1:30180` for `dev`
 - `https://127.0.0.1:30190` for `prod`
 
+Access Grafana locally:
+
+- `http://127.0.0.1:30280` for `dev`
+- `http://127.0.0.1:30290` for `prod`
+- default login: `admin` / `admin`
+
 ## Notes
 
 - The Argo CD `Application` destination is `https://kubernetes.default.svc`, so
@@ -125,9 +135,15 @@ Access the Argo CD UIs locally:
   Argo CD repository secret to both clusters without storing the private key in
   Git.
 - PostgreSQL is deployed internally in each cluster as a single-replica
-  StatefulSet and is not exposed through Kong.
+  StatefulSet and is split into standalone Argo CD applications `dev-db` and
+  `prod-db`.
+- Grafana, Prometheus, Loki, and Alloy are deployed as standalone Argo CD
+  applications `dev-obs` and `prod-obs`.
+- Grafana is exposed on new host ports, so if your existing clusters were
+  created before this change you need to recreate them for the Grafana URLs to
+  work.
 - Kong runs in DB-less mode using declarative configuration from
-  `workloads/*/kong.yaml`.
+  `workloads/*/app/kong.yaml`.
 - `install-argocd.sh` patches `argocd-server` to `NodePort` so the UI is
   reachable on the host ports above after cluster creation.
 - If you want one central Argo CD to manage both clusters, the application

@@ -34,12 +34,22 @@ render_application() {
     "$template_path" > "$output_path"
 }
 
-render_application \
-  "$script_dir/argocd/hello-dev-application.yaml" \
-  "$tmp_dir/hello-dev-application.yaml"
-render_application \
-  "$script_dir/argocd/hello-prod-application.yaml" \
-  "$tmp_dir/hello-prod-application.yaml"
+for application in \
+  dev-app \
+  dev-db \
+  dev-obs \
+  prod-app \
+  prod-db \
+  prod-obs
+do
+  render_application \
+    "$script_dir/argocd/${application}-application.yaml" \
+    "$tmp_dir/${application}-application.yaml"
+done
 
-kubectl apply --context kind-dev -f "$tmp_dir/hello-dev-application.yaml"
-kubectl apply --context kind-prod -f "$tmp_dir/hello-prod-application.yaml"
+kubectl apply --context kind-dev -f "$tmp_dir/dev-app-application.yaml"
+kubectl apply --context kind-dev -f "$tmp_dir/dev-db-application.yaml"
+kubectl apply --context kind-dev -f "$tmp_dir/dev-obs-application.yaml"
+kubectl apply --context kind-prod -f "$tmp_dir/prod-app-application.yaml"
+kubectl apply --context kind-prod -f "$tmp_dir/prod-db-application.yaml"
+kubectl apply --context kind-prod -f "$tmp_dir/prod-obs-application.yaml"

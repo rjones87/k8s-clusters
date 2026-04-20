@@ -2,7 +2,8 @@
 # Install Argo CD in this cluster, then run deploy-hello-apps.sh to register
 # the hello-dev Argo CD Application that syncs workloads/dev.
 # Kong is exposed on host port 30080 via NodePort 30080 and routes requests to
-# the internal workloads. Argo CD is exposed on host port 30180.
+# the internal workloads. Argo CD is exposed on host port 30180 and Grafana is
+# exposed on host port 30280.
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 name: dev
@@ -15,5 +16,9 @@ nodes:
         protocol: TCP
       - containerPort: 30180
         hostPort: 30180
+        listenAddress: "127.0.0.1"
+        protocol: TCP
+      - containerPort: 30280
+        hostPort: 30280
         listenAddress: "127.0.0.1"
         protocol: TCP
