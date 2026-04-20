@@ -137,6 +137,8 @@ Access Grafana locally:
 - `build-custom-images.sh` must be run after cluster creation and before syncing
   custom-image workloads so `kind` can serve those images locally.
 - Alloy ships pod logs to Loki, so services only need to log to `stdout`.
+- Alloy relabels Kubernetes metadata into Loki labels, so Grafana log queries can
+  filter by labels such as `namespace`, `pod`, `container`, `node`, and `app`.
 - Prometheus now discovers annotated pods, so new services should add standard
   `prometheus.io/*` annotations to their pod template.
 - The Argo CD `Application` destination is `https://kubernetes.default.svc`, so
