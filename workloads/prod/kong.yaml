@@ -39,7 +39,7 @@ spec:
     spec:
       containers:
         - name: kong
-          image: kong:3.10
+          image: kong:3.9
           env:
             - name: KONG_DATABASE
               value: "off"
