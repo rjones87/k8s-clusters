@@ -25,5 +25,5 @@ for context in "${clusters[@]}"; do
     --from-literal=sshPrivateKey="$ssh_private_key" \
     --dry-run=client -o yaml \
     | kubectl label --local -f - argocd.argoproj.io/secret-type=repository -o yaml \
-    | kubectl apply -f -
+    | kubectl apply --context "$context" -f -
 done

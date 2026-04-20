@@ -8,11 +8,11 @@ data:
     _format_version: "3.0"
     services:
       - name: hello-prod-service
-        url: http://hello-prod.default.svc.cluster.local:80
+        url: http://hello-prod.default.svc.cluster.local:80/hello
         routes:
           - name: hello-prod-route
             paths:
-              - /hello
+              - /api/hello
             strip_path: true
       - name: nginx-prod-service
         url: http://nginx-prod.default.svc.cluster.local:80

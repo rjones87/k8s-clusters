@@ -8,11 +8,11 @@ data:
     _format_version: "3.0"
     services:
       - name: hello-dev-service
-        url: http://hello-dev.default.svc.cluster.local:80
+        url: http://hello-dev.default.svc.cluster.local:80/hello
         routes:
           - name: hello-dev-route
             paths:
-              - /hello
+              - /api/hello
             strip_path: true
       - name: nginx-dev-service
         url: http://nginx-dev.default.svc.cluster.local:80

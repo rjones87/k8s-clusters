@@ -12,12 +12,37 @@ spec:
     metadata:
       labels:
         app: hello-prod
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "3000"
     spec:
       containers:
         - name: hello
-          image: nginxdemos/hello:plain-text
+          image: hello-api:0.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "3000"
+            - name: APP_ENV
+              value: "prod"
+            - name: SERVICE_NAME
+              value: "hello-prod"
           ports:
-            - containerPort: 80
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
 ---
 apiVersion: v1
 kind: Service
@@ -30,5 +55,5 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 80
+      targetPort: 3000
   type: ClusterIP

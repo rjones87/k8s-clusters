@@ -14,9 +14,12 @@ each cluster through Argo CD.
 - `workloads/prod/db/*`: db-tier workloads synced into `prod-db`
 - `workloads/prod/obs/*`: observability workloads synced into `prod-obs`
 - `argocd/*.yaml`: Argo CD `Application` templates
+- `src/*`: source for custom container images that are deployed into the clusters
+- `src/SERVICES.md`: rules for adding a new custom service
 - `bootstrap-argocd-repo-creds.sh`: creates Argo CD repo credentials in both clusters from a local SSH key
 - `install-argocd.sh`: installs Argo CD into both clusters
 - `deploy-hello-apps.sh`: renders and applies the `Application` resources
+- `build-custom-images.sh`: builds local custom images and loads them into both `kind` clusters
 
 ## Prerequisites
 
@@ -111,9 +114,9 @@ kubectl get statefulset,pvc --context kind-prod
 
 Access the services locally through Kong:
 
-- `http://127.0.0.1:30080/hello` for the `dev` hello service
+- `http://127.0.0.1:30080/api/hello` for the `dev` hello service
 - `http://127.0.0.1:30080/nginx` for the `dev` nginx service
-- `http://127.0.0.1:30090/hello` for the `prod` hello service
+- `http://127.0.0.1:30090/api/hello` for the `prod` hello service
 - `http://127.0.0.1:30090/nginx` for the `prod` nginx service
 
 Access the Argo CD UIs locally:
@@ -129,6 +132,13 @@ Access Grafana locally:
 
 ## Notes
 
+- `src/hello-api` is the reference custom service. It is a Node.js + Express app
+  with `/hello`, `/health`, and `/metrics`.
+- `build-custom-images.sh` must be run after cluster creation and before syncing
+  custom-image workloads so `kind` can serve those images locally.
+- Alloy ships pod logs to Loki, so services only need to log to `stdout`.
+- Prometheus now discovers annotated pods, so new services should add standard
+  `prometheus.io/*` annotations to their pod template.
 - The Argo CD `Application` destination is `https://kubernetes.default.svc`, so
   each cluster runs its own Argo CD instance and syncs into itself.
 - `bootstrap-argocd-repo-creds.sh` reads the local deploy key and applies the
