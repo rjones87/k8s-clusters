@@ -4,9 +4,9 @@ set -euo pipefail
 
 script_dir=${0:A:h}
 
-argocd_repo_url="${ARGOCD_REPO_URL:-https://github.com/rjones87/k8s-clusters.git}"
+argocd_repo_url="${ARGOCD_REPO_URL:-git@github.com:rjones87/k8s-clusters.git}"
 argocd_namespace="${ARGOCD_NAMESPACE:-argocd}"
-argocd_target_revision="${ARGOCD_TARGET_REVISION:-HEAD}"
+argocd_target_revision="${ARGOCD_TARGET_REVISION:-master}"
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 

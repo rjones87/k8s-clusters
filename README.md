@@ -10,6 +10,7 @@ each cluster through Argo CD.
 - `workloads/dev/hello.yaml`: workload synced into `kind-dev`
 - `workloads/prod/hello.yaml`: workload synced into `kind-prod`
 - `argocd/*.yaml`: Argo CD `Application` templates
+- `bootstrap-argocd-repo-creds.sh`: creates Argo CD repo credentials in both clusters from a local SSH key
 - `install-argocd.sh`: installs Argo CD into both clusters
 - `deploy-hello-apps.sh`: renders and applies the `Application` resources
 
@@ -18,6 +19,8 @@ each cluster through Argo CD.
 - `kind`
 - `kubectl`
 - Docker or another supported `kind` container runtime
+- a GitHub deploy key private key available locally for this repo, defaulting to
+  `~/.ssh/argocd-k8s-clusters`
 
 ## 1. Create the clusters
 
@@ -32,11 +35,39 @@ kind create cluster --name prod --config kind-prod.yaml
 ./install-argocd.sh
 ```
 
-## 3. Register the applications
+## 3. Bootstrap Argo CD repository credentials
+
+This repository is private, so each Argo CD instance needs SSH credentials before
+it can sync.
+
+Generate a dedicated deploy key if you do not already have one:
+
+```sh
+ssh-keygen -t ed25519 -f ~/.ssh/argocd-k8s-clusters -N "" -C "argocd-k8s-clusters"
+```
+
+Add the public key at `~/.ssh/argocd-k8s-clusters.pub` to the GitHub repository
+as a read-only deploy key, then create the Argo CD repository secret in both
+clusters:
+
+```sh
+./bootstrap-argocd-repo-creds.sh
+```
+
+Optional overrides:
+
+```sh
+ARGOCD_SSH_KEY_PATH=$HOME/.ssh/argocd-k8s-clusters \
+ARGOCD_REPO_URL=git@github.com:rjones87/k8s-clusters.git \
+ARGOCD_NAMESPACE=argocd \
+./bootstrap-argocd-repo-creds.sh
+```
+
+## 4. Register the applications
 
 By default, `deploy-hello-apps.sh` points Argo CD at this GitHub repository:
 
-- `https://github.com/rjones87/k8s-clusters.git`
+- `git@github.com:rjones87/k8s-clusters.git`
 
 Apply the `Application` resources:
 
@@ -50,13 +81,13 @@ Optional overrides:
 ARGOCD_INSTALL_URL=https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml \
 ./install-argocd.sh
 
-ARGOCD_REPO_URL=https://github.com/rjones87/k8s-clusters.git \
-ARGOCD_TARGET_REVISION=main \
+ARGOCD_REPO_URL=git@github.com:rjones87/k8s-clusters.git \
+ARGOCD_TARGET_REVISION=master \
 ARGOCD_NAMESPACE=argocd \
 ./deploy-hello-apps.sh
 ```
 
-## 4. Verify deployment
+## 5. Verify deployment
 
 Check the `Application` objects:
 
@@ -88,6 +119,9 @@ Access the Argo CD UIs locally:
 
 - The Argo CD `Application` destination is `https://kubernetes.default.svc`, so
   each cluster runs its own Argo CD instance and syncs into itself.
+- `bootstrap-argocd-repo-creds.sh` reads the local deploy key and applies the
+  Argo CD repository secret to both clusters without storing the private key in
+  Git.
 - Kong runs in DB-less mode using declarative configuration from
   `workloads/*/kong.yaml`.
 - `install-argocd.sh` patches `argocd-server` to `NodePort` so the UI is
