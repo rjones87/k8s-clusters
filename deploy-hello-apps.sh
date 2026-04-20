@@ -4,8 +4,7 @@ set -euo pipefail
 
 script_dir=${0:A:h}
 
-: "${ARGOCD_REPO_URL:?Set ARGOCD_REPO_URL to the Git repository URL Argo CD should sync from.}"
-
+argocd_repo_url="${ARGOCD_REPO_URL:-https://github.com/rjones87/k8s-clusters.git}"
 argocd_namespace="${ARGOCD_NAMESPACE:-argocd}"
 argocd_target_revision="${ARGOCD_TARGET_REVISION:-HEAD}"
 tmp_dir=$(mktemp -d)
@@ -24,7 +23,7 @@ render_application() {
   local output_path="$2"
   local repo_url_escaped namespace_escaped revision_escaped
 
-  repo_url_escaped=$(escape_for_sed "$ARGOCD_REPO_URL")
+  repo_url_escaped=$(escape_for_sed "$argocd_repo_url")
   namespace_escaped=$(escape_for_sed "$argocd_namespace")
   revision_escaped=$(escape_for_sed "$argocd_target_revision")
 

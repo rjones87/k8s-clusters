@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kong-config-prod
+  namespace: default
+data:
+  kong.yml: |
+    _format_version: "3.0"
+    services:
+      - name: hello-prod-service
+        url: http://hello-prod.default.svc.cluster.local:80
+        routes:
+          - name: hello-prod-route
+            paths:
+              - /hello
+            strip_path: true
+      - name: nginx-prod-service
+        url: http://nginx-prod.default.svc.cluster.local:80
+        routes:
+          - name: nginx-prod-route
+            paths:
+              - /nginx
+            strip_path: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong-prod
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong-prod
+  template:
+    metadata:
+      labels:
+        app: kong-prod
+    spec:
+      containers:
+        - name: kong
+          image: kong:3.10
+          env:
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_DECLARATIVE_CONFIG
+              value: /kong_dbless/kong.yml
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_PROXY_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_LISTEN
+              value: "off"
+          ports:
+            - name: proxy
+              containerPort: 8000
+            - name: proxy-ssl
+              containerPort: 8443
+          volumeMounts:
+            - name: kong-config
+              mountPath: /kong_dbless
+      volumes:
+        - name: kong-config
+          configMap:
+            name: kong-config-prod
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-prod
+  namespace: default
+spec:
+  selector:
+    app: kong-prod
+  ports:
+    - name: proxy
+      port: 80
+      targetPort: 8000
+      nodePort: 30080
+  type: NodePort
