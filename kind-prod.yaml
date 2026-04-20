@@ -1,0 +1,14 @@
+# Cluster definition for the prod kind cluster.
+# Install Argo CD in this cluster, then run deploy-hello-apps.sh to register
+# the hello-prod Argo CD Application that syncs workloads/prod.
+# The workload is exposed on host port 30090 via NodePort 30080.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: prod
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 30090
+        listenAddress: "127.0.0.1"
+        protocol: TCP

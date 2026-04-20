@@ -1,0 +1,14 @@
+# Cluster definition for the dev kind cluster.
+# Install Argo CD in this cluster, then run deploy-hello-apps.sh to register
+# the hello-dev Argo CD Application that syncs workloads/dev.
+# The workload is exposed on host port 30080 via NodePort 30080.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: dev
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 30080
+        listenAddress: "127.0.0.1"
+        protocol: TCP
