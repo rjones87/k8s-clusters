@@ -5,11 +5,12 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 const serviceName = process.env.SERVICE_NAME || "hello-api";
 const environment = process.env.APP_ENV || "unknown";
+const metricPrefix = `${serviceName.replace(/[^a-zA-Z0-9]+/g, "_")}_`;
 
-client.collectDefaultMetrics();
+client.collectDefaultMetrics({ prefix: metricPrefix });
 
 const helloRequestsTotal = new client.Counter({
-  name: "hello_api_requests_total",
+  name: `${metricPrefix}requests_total`,
   help: "Total number of hello API requests",
   labelNames: ["route", "method", "status_code"],
 });

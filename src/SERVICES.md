@@ -22,10 +22,11 @@ Every new service added under `src/` should follow these rules:
 3. Expose a lightweight health check on `GET /health`.
 4. Log to `stdout` and `stderr` so Alloy can ship logs to Loki.
 5. Add Prometheus pod annotations so the in-cluster Prometheus instance can scrape metrics.
-6. Add a Kubernetes `Deployment` and `Service` in both:
+6. Prefix every metric name with a service-specific prefix.
+7. Add a Kubernetes `Deployment` and `Service` in both:
    - `workloads/dev/app/`
    - `workloads/prod/app/`
-7. Add a Kong route in both:
+8. Add a Kong route in both:
    - `workloads/dev/app/kong.yaml`
    - `workloads/prod/app/kong.yaml`
 
@@ -87,6 +88,11 @@ Example:
 
 - Logs: Alloy already collects pod logs from Kubernetes and pushes them to Loki.
 - Metrics: Prometheus scrapes annotated pods, and Grafana can query Prometheus.
+- Metric names should be prefixed with the service name. For example, a service
+  named `orders-api` should emit metrics such as:
+  - `orders_api_requests_total`
+  - `orders_api_process_cpu_seconds_total`
+  - `orders_api_nodejs_eventloop_lag_seconds`
 
 If a service writes structured JSON logs, keep them on `stdout`. Do not write
 logs to local files inside the container.

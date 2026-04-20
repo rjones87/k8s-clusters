@@ -134,6 +134,8 @@ Access Grafana locally:
 
 - `src/hello-api` is the reference custom service. It is a Node.js + Express app
   with `/hello`, `/health`, and `/metrics`.
+- Custom services should prefix all Prometheus metrics with their service name so
+  they are easy to identify in Grafana and Prometheus.
 - `build-custom-images.sh` must be run after cluster creation and before syncing
   custom-image workloads so `kind` can serve those images locally.
 - Alloy ships pod logs to Loki, so services only need to log to `stdout`.
