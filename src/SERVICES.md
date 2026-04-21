@@ -91,8 +91,12 @@ Example:
 - Metric names should be prefixed with the service name. For example, a service
   named `orders-api` should emit metrics such as:
   - `orders_api_requests_total`
+  - `orders_api_healthcheck_up`
+  - `orders_api_healthcheck_requests_total`
   - `orders_api_process_cpu_seconds_total`
   - `orders_api_nodejs_eventloop_lag_seconds`
+- Health checks should have their own metrics and should not be mixed into the
+  main business request counter.
 
 If a service writes structured JSON logs, keep them on `stdout`. Do not write
 logs to local files inside the container.

@@ -136,6 +136,8 @@ Access Grafana locally:
   with `/hello`, `/health`, and `/metrics`.
 - Custom services should prefix all Prometheus metrics with their service name so
   they are easy to identify in Grafana and Prometheus.
+- Health checks are tracked separately from normal API traffic, including a
+  dedicated `*_healthcheck_up` gauge and `*_healthcheck_requests_total` counter.
 - `build-custom-images.sh` must be run after cluster creation and before syncing
   custom-image workloads so `kind` can serve those images locally.
 - Alloy ships pod logs to Loki, so services only need to log to `stdout`.
