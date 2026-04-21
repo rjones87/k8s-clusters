@@ -9,7 +9,6 @@ data:
       http_listen_port: 3200
 
     distributor:
-      enable_metrics_generator_ring: true
       receivers:
         otlp:
           protocols:
