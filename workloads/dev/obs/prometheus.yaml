@@ -43,6 +43,10 @@ data:
         metrics_path: /metrics
         static_configs:
           - targets: ["loki.observability.svc.cluster.local:3100"]
+      - job_name: tempo
+        metrics_path: /metrics
+        static_configs:
+          - targets: ["tempo.observability.svc.cluster.local:3200"]
       - job_name: grafana
         metrics_path: /metrics
         static_configs:

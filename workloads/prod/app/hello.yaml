@@ -28,6 +28,8 @@ spec:
               value: "prod"
             - name: SERVICE_NAME
               value: "hello-prod"
+            - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+              value: "http://tempo.observability.svc.cluster.local:4318/v1/traces"
           ports:
             - containerPort: 3000
               name: http

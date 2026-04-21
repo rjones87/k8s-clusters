@@ -1,3 +1,6 @@
+const { currentTraceFields, startTracing } = require("./tracing");
+startTracing();
+
 const express = require("express");
 const { Pool } = require("pg");
 const client = require("prom-client");
@@ -123,6 +126,8 @@ async function refreshCommentsCount() {
 }
 
 function logRequest(req, res, durationMs) {
+  const traceFields = currentTraceFields();
+
   console.log(
     JSON.stringify({
       level: "info",
@@ -133,6 +138,8 @@ function logRequest(req, res, durationMs) {
       statusCode: res.statusCode,
       durationMs,
       kongRequestId: req.get("x-kong-request-id") || null,
+      traceId: traceFields.traceId,
+      spanId: traceFields.spanId,
       message: "request completed",
     }),
   );
@@ -336,6 +343,8 @@ app.use((error, req, res, _next) => {
         service: serviceName,
         env: environment,
         kongRequestId: req.get("x-kong-request-id") || null,
+        traceId: currentTraceFields().traceId,
+        spanId: currentTraceFields().spanId,
         message: "invalid json request body",
         error: error.message,
       }),
@@ -354,6 +363,8 @@ app.use((error, req, res, _next) => {
       service: serviceName,
       env: environment,
       kongRequestId: req.get("x-kong-request-id") || null,
+      traceId: currentTraceFields().traceId,
+      spanId: currentTraceFields().spanId,
       message: "request failed",
       error: error.message,
     }),
@@ -376,11 +387,13 @@ async function start() {
       console.error(
         JSON.stringify({
           level: "warn",
-          service: serviceName,
-          env: environment,
-          attempt: attempts,
-          message: "database setup failed, retrying",
-          error: error.message,
+        service: serviceName,
+        env: environment,
+        attempt: attempts,
+        traceId: null,
+        spanId: null,
+        message: "database setup failed, retrying",
+        error: error.message,
         }),
       );
 
@@ -399,6 +412,8 @@ async function start() {
         service: serviceName,
         env: environment,
         port,
+        traceId: null,
+        spanId: null,
         message: "service started",
       }),
     );
@@ -411,6 +426,8 @@ start().catch((error) => {
       level: "error",
       service: serviceName,
       env: environment,
+      traceId: null,
+      spanId: null,
       message: "service failed to start",
       error: error.message,
     }),

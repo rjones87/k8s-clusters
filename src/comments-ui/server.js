@@ -1,3 +1,6 @@
+const { currentTraceFields, startTracing } = require("./tracing");
+startTracing();
+
 const http = require("http");
 const next = require("next");
 const client = require("prom-client");
@@ -40,6 +43,8 @@ app
       const kongRequestId = req.headers["x-kong-request-id"] || null;
 
       const logRequest = () => {
+        const traceFields = currentTraceFields();
+
         console.log(
           JSON.stringify({
             level: "info",
@@ -50,6 +55,8 @@ app
             statusCode: res.statusCode,
             durationMs: Date.now() - startedAt,
             kongRequestId,
+            traceId: traceFields.traceId,
+            spanId: traceFields.spanId,
             message: "request completed",
           }),
         );
@@ -100,6 +107,8 @@ app
             method: req.method,
             path: req.url,
             kongRequestId,
+            traceId: currentTraceFields().traceId,
+            spanId: currentTraceFields().spanId,
             message: "request failed",
             error: error.message,
           }),
@@ -118,6 +127,8 @@ app
           service: serviceName,
           env: environment,
           port,
+          traceId: null,
+          spanId: null,
           message: "service started",
         }),
       );
@@ -129,6 +140,8 @@ app
         level: "error",
         service: serviceName,
         env: environment,
+        traceId: null,
+        spanId: null,
         message: "service failed to start",
         error: error.message,
       }),
