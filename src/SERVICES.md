@@ -29,6 +29,8 @@ Every new service added under `src/` should follow these rules:
 8. Add a Kong route in both:
    - `workloads/dev/app/kong.yaml`
    - `workloads/prod/app/kong.yaml`
+9. If the service changes a public API exposed through Kong, update the OpenAPI
+   document in `src/api-docs-service/openapi.json` so `/docs/api` stays current.
 
 ## Directory template
 
@@ -143,3 +145,5 @@ logs to local files inside the container.
 ## Example
 
 `src/hello-api/` is the reference implementation for new services in this repo.
+`src/api-docs-service/` is the reference for how this repo publishes a shared
+OpenAPI/Swagger view for all services exposed through Kong.

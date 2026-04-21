@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-docs-prod
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-docs-prod
+  template:
+    metadata:
+      labels:
+        app: api-docs-prod
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "3000"
+    spec:
+      containers:
+        - name: api-docs
+          image: api-docs-service:0.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "3000"
+            - name: APP_ENV
+              value: "prod"
+            - name: SERVICE_NAME
+              value: "api-docs-prod"
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-docs-prod
+  namespace: default
+spec:
+  selector:
+    app: api-docs-prod
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  type: ClusterIP

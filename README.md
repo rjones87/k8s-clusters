@@ -131,9 +131,11 @@ Access the services locally through Kong:
 
 - `http://127.0.0.1:30080/api/hello` for the `dev` hello service
 - `http://127.0.0.1:30080/api/comments` for the `dev` comments service
+- `http://127.0.0.1:30080/docs/api` for the `dev` API docs
 - `http://127.0.0.1:30080/nginx` for the `dev` nginx service
 - `http://127.0.0.1:30090/api/hello` for the `prod` hello service
 - `http://127.0.0.1:30090/api/comments` for the `prod` comments service
+- `http://127.0.0.1:30090/docs/api` for the `prod` API docs
 - `http://127.0.0.1:30090/nginx` for the `prod` nginx service
 
 Access the Argo CD UIs locally:
@@ -154,6 +156,8 @@ Access Grafana locally:
 - `src/comments-api` is a Node.js + Express CRUD service backed by a dedicated
   PostgreSQL instance per environment. It creates its own table if needed and
   exposes CRUD and latency metrics for comment operations.
+- `src/api-docs-service` publishes a shared OpenAPI document and Swagger UI for
+  the services exposed through Kong at `/docs/api`.
 - Custom services should prefix all Prometheus metrics with their service name so
   they are easy to identify in Grafana and Prometheus.
 - Health checks are tracked separately from normal API traffic, including a

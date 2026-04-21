@@ -1,0 +1,15 @@
+{
+  "name": "api-docs-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Swagger UI service for cluster APIs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "prom-client": "^15.1.3",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

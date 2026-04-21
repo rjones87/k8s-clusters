@@ -28,6 +28,13 @@ data:
             paths:
               - /api/comments
             strip_path: true
+      - name: api-docs-prod-service
+        url: http://api-docs-prod.default.svc.cluster.local:80
+        routes:
+          - name: api-docs-prod-route
+            paths:
+              - /docs/api
+            strip_path: false
 ---
 apiVersion: apps/v1
 kind: Deployment

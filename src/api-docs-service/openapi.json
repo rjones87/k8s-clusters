@@ -1,0 +1,240 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cluster Services API",
+    "version": "0.1.0",
+    "description": "OpenAPI documentation for the services exposed through Kong in this repo."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:30080",
+      "description": "Dev via Kong"
+    },
+    {
+      "url": "http://localhost:30090",
+      "description": "Prod via Kong"
+    }
+  ],
+  "tags": [
+    {
+      "name": "hello"
+    },
+    {
+      "name": "comments"
+    }
+  ],
+  "paths": {
+    "/api/hello": {
+      "get": {
+        "tags": ["hello"],
+        "summary": "Return a hello world response",
+        "responses": {
+          "200": {
+            "description": "Hello response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelloResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comments": {
+      "get": {
+        "tags": ["comments"],
+        "summary": "List comments",
+        "responses": {
+          "200": {
+            "description": "List of comments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["comments"],
+        "summary": "Create a comment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/comments/{id}": {
+      "get": {
+        "tags": ["comments"],
+        "summary": "Get one comment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CommentId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Comment not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["comments"],
+        "summary": "Update a comment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CommentId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "404": {
+            "description": "Comment not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["comments"],
+        "summary": "Delete a comment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CommentId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Comment not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "CommentId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        }
+      }
+    },
+    "schemas": {
+      "HelloResponse": {
+        "type": "object",
+        "required": ["message", "service", "env"],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string"
+          },
+          "env": {
+            "type": "string"
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "required": ["id", "author", "message", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "author": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateCommentRequest": {
+        "type": "object",
+        "required": ["author", "message"],
+        "properties": {
+          "author": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
