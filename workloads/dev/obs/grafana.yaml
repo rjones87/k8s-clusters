@@ -30,6 +30,8 @@ metadata:
   name: grafana
   namespace: observability
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
