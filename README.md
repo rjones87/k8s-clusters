@@ -106,7 +106,7 @@ ARGOCD_INSTALL_URL=https://raw.githubusercontent.com/argoproj/argo-cd/stable/man
 ./install-argocd.sh
 
 ARGOCD_REPO_URL=git@github.com:rjones87/k8s-clusters.git \
-ARGOCD_TARGET_REVISION=master \
+ARGOCD_TARGET_REVISION=feat-observability-upgrade \
 ARGOCD_NAMESPACE=argocd \
 ./deploy-hello-apps.sh
 ```
