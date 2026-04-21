@@ -106,7 +106,7 @@ ARGOCD_INSTALL_URL=https://raw.githubusercontent.com/argoproj/argo-cd/stable/man
 ./install-argocd.sh
 
 ARGOCD_REPO_URL=git@github.com:rjones87/k8s-clusters.git \
-ARGOCD_TARGET_REVISION=feat-observability-upgrade \
+ARGOCD_TARGET_REVISION=master \
 ARGOCD_NAMESPACE=argocd \
 ./deploy-hello-apps.sh
 ```
@@ -156,6 +156,11 @@ Grafana is provisioned with:
 - `Prometheus` for metrics
 - `Loki` for logs
 - `Tempo` for traces
+
+The Loki-to-Tempo clickthrough is intentionally not provisioned right now.
+Grafana 12.4.2 failed startup when the datasource config referenced other
+datasources during provisioning, so traces and logs are available as separate
+datasources until a safer correlation setup is added.
 
 Temporary PostgreSQL access for local tools such as DBeaver:
 
@@ -232,11 +237,13 @@ kubectl delete --context kind-dev -f chaos/dev/pod-kill-comments.yaml
 - Health checks are tracked separately from normal API traffic, including a
   dedicated `*_healthcheck_up` gauge and `*_healthcheck_requests_total` counter.
 - `build-custom-images.sh` must be run after cluster creation and before syncing
-  custom-image workloads so `kind` can serve those images locally.
+  custom-image workloads so `kind` can serve those images locally. The script
+  now also restarts the custom app deployments in any existing cluster contexts
+  so rebuilt local images are picked up immediately.
 - The observability stack includes Tempo, and the custom Node services export
   OTLP traces directly to `http://tempo.observability.svc.cluster.local:4318`.
-- Service logs now include `traceId` and `spanId`, so Grafana can pivot from
-  Loki log lines into Tempo traces.
+- Service logs now include `traceId` and `spanId`, which is enough to correlate
+  logs and traces manually while Grafana datasource cross-links remain disabled.
 - Rebuilding a single cluster is straightforward:
   1. `./manage-kind-cluster.sh recreate <dev|prod>`
   2. `./install-argocd.sh`

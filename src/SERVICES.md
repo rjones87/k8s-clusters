@@ -92,8 +92,8 @@ Example:
 - Logs: Alloy already collects pod logs from Kubernetes and pushes them to Loki.
 - Metrics: Prometheus scrapes annotated pods, and Grafana can query Prometheus.
 - Traces: custom Node services should export OTLP traces to Tempo and include
-  `traceId` / `spanId` in their structured logs so Grafana can pivot between
-  traces and logs.
+  `traceId` / `spanId` in their structured logs so traces and logs can be
+  correlated even when Grafana datasource cross-links are disabled.
 - Metric names should be prefixed with the service name. For example, a service
   named `orders-api` should emit metrics such as:
   - `orders_api_requests_total`
@@ -106,8 +106,8 @@ Example:
 - Service request logs should include the inbound `X-Kong-Request-Id` header
   when present so a single request can be traced in Grafana/Loki from the
   gateway to the upstream service.
-- Service request logs should also include `traceId` and `spanId` so Grafana's
-  Loki datasource can link directly into Tempo.
+- Service request logs should also include `traceId` and `spanId` so operators
+  can correlate Loki log lines with Tempo traces.
 
 Every new service should follow the same metric pattern used by
 `src/hello-api/`:
