@@ -97,6 +97,9 @@ Example:
   - `orders_api_nodejs_eventloop_lag_seconds`
 - Health checks should have their own metrics and should not be mixed into the
   main business request counter.
+- Service request logs should include the inbound `X-Kong-Request-Id` header
+  when present so a single request can be traced in Grafana/Loki from the
+  gateway to the upstream service.
 
 Every new service should follow the same metric pattern used by
 `src/hello-api/`:

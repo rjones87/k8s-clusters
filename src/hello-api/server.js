@@ -30,6 +30,7 @@ healthcheckUp.set(1);
 
 app.use((req, res, next) => {
   const startedAt = Date.now();
+  const kongRequestId = req.get("x-kong-request-id") || null;
 
   res.on("finish", () => {
     if (req.path === "/health") {
@@ -56,6 +57,7 @@ app.use((req, res, next) => {
         path: req.path,
         statusCode: res.statusCode,
         durationMs,
+        kongRequestId,
         message: "request completed",
       }),
     );

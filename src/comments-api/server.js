@@ -132,6 +132,7 @@ function logRequest(req, res, durationMs) {
       path: req.path,
       statusCode: res.statusCode,
       durationMs,
+      kongRequestId: req.get("x-kong-request-id") || null,
       message: "request completed",
     }),
   );
@@ -333,6 +334,7 @@ app.use((error, _req, res, _next) => {
       level: "error",
       service: serviceName,
       env: environment,
+      kongRequestId: _req.get("x-kong-request-id") || null,
       message: "request failed",
       error: error.message,
     }),
