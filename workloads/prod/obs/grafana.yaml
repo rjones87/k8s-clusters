@@ -18,25 +18,11 @@ data:
         type: tempo
         access: proxy
         url: http://tempo.observability.svc.cluster.local:3200
-        jsonData:
-          tracesToLogsV2:
-            datasourceUid: loki
-            filterByTraceID: true
-            filterBySpanID: false
-            customQuery: false
-            spanStartTimeShift: "-5m"
-            spanEndTimeShift: "5m"
       - name: Loki
         uid: loki
         type: loki
         access: proxy
         url: http://loki.observability.svc.cluster.local:3100
-        jsonData:
-          derivedFields:
-            - datasourceUid: tempo
-              matcherRegex: '"traceId":"([a-f0-9]+)"'
-              name: trace_id
-              url: '$${__value.raw}'
 ---
 apiVersion: apps/v1
 kind: Deployment
