@@ -13,17 +13,6 @@ data:
         access: proxy
         url: http://prometheus.observability.svc.cluster.local:9090
         isDefault: true
-      - name: Loki
-        uid: loki
-        type: loki
-        access: proxy
-        url: http://loki.observability.svc.cluster.local:3100
-        jsonData:
-          derivedFields:
-            - datasourceUid: tempo
-              matcherRegex: '"traceId":"([a-f0-9]+)"'
-              name: trace_id
-              url: '$${__value.raw}'
       - name: Tempo
         uid: tempo
         type: tempo
@@ -37,6 +26,17 @@ data:
             customQuery: false
             spanStartTimeShift: "-5m"
             spanEndTimeShift: "5m"
+      - name: Loki
+        uid: loki
+        type: loki
+        access: proxy
+        url: http://loki.observability.svc.cluster.local:3100
+        jsonData:
+          derivedFields:
+            - datasourceUid: tempo
+              matcherRegex: '"traceId":"([a-f0-9]+)"'
+              name: trace_id
+              url: '$${__value.raw}'
 ---
 apiVersion: apps/v1
 kind: Deployment
