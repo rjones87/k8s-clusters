@@ -98,6 +98,42 @@ Example:
 - Health checks should have their own metrics and should not be mixed into the
   main business request counter.
 
+Every new service should follow the same metric pattern used by
+`src/hello-api/`:
+
+- Use `prom-client.collectDefaultMetrics({ prefix: metricPrefix })` so Node.js
+  and process metrics are automatically prefixed with the service name.
+- Create a main request counter for business traffic only.
+- Exclude `/health` and `/metrics` from the main request counter.
+- Create a dedicated health-check counter such as
+  `<service>_healthcheck_requests_total`.
+- Create a dedicated health gauge such as `<service>_healthcheck_up`.
+- Keep metric labels simple and stable. For HTTP counters, use labels such as:
+  - `route`
+  - `method`
+  - `status_code`
+
+Recommended metric shape for every service:
+
+- `<service>_requests_total`
+  Counts only normal API traffic.
+- `<service>_healthcheck_requests_total`
+  Counts readiness/liveness probe traffic separately.
+- `<service>_healthcheck_up`
+  Reports `1` when the service is healthy enough to answer health checks.
+- `<service>_process_*`
+  Default process metrics from `prom-client`.
+- `<service>_nodejs_*`
+  Default Node.js runtime metrics from `prom-client`.
+
+Example for a service named `orders-api`:
+
+- `orders_api_requests_total`
+- `orders_api_healthcheck_requests_total`
+- `orders_api_healthcheck_up`
+- `orders_api_process_cpu_seconds_total`
+- `orders_api_nodejs_eventloop_lag_seconds`
+
 If a service writes structured JSON logs, keep them on `stdout`. Do not write
 logs to local files inside the container.
 
