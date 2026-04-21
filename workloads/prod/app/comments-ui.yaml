@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comments-ui-prod
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comments-ui-prod
+  template:
+    metadata:
+      labels:
+        app: comments-ui-prod
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "3000"
+    spec:
+      containers:
+        - name: comments-ui
+          image: comments-ui:0.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "3000"
+            - name: APP_ENV
+              value: "prod"
+            - name: SERVICE_NAME
+              value: "comments-ui-prod"
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: comments-ui-prod
+  namespace: default
+spec:
+  selector:
+    app: comments-ui-prod
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  type: ClusterIP

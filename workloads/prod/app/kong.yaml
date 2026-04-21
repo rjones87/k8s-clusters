@@ -35,6 +35,13 @@ data:
             paths:
               - /docs/api
             strip_path: false
+      - name: comments-ui-prod-service
+        url: http://comments-ui-prod.default.svc.cluster.local:80
+        routes:
+          - name: comments-ui-prod-route
+            paths:
+              - /comments
+            strip_path: false
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -1,0 +1,254 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f5ef;
+  --surface: #fffdf8;
+  --surface-strong: #f1ede2;
+  --text: #1c1a17;
+  --muted: #645d52;
+  --border: #d7cfbe;
+  --accent: #0f766e;
+  --accent-strong: #115e59;
+  --danger: #b91c1c;
+  --shadow: 0 20px 60px rgba(28, 26, 23, 0.08);
+  font-family: "IBM Plex Sans", "Avenir Next", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 35%),
+    linear-gradient(180deg, #faf7f0 0%, #f3ede1 100%);
+  color: var(--text);
+}
+
+body {
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+}
+
+.hero {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.layout {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid rgba(215, 207, 190, 0.85);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.panel h2,
+.panel h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.panel p {
+  color: var(--muted);
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+}
+
+.field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 120ms ease, opacity 120ms ease, background 120ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.button-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.button-secondary {
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+.button-danger {
+  background: rgba(185, 28, 28, 0.1);
+  color: var(--danger);
+}
+
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.comment-list {
+  display: grid;
+  gap: 14px;
+}
+
+.comment-card {
+  border: 1px solid rgba(215, 207, 190, 0.85);
+  border-radius: 18px;
+  padding: 18px;
+  background: linear-gradient(180deg, #fffdf8 0%, #fbf7ec 100%);
+}
+
+.comment-card h3 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+
+.comment-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.comment-card p {
+  white-space: pre-wrap;
+}
+
+.alert {
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+}
+
+.alert-error {
+  background: rgba(185, 28, 28, 0.08);
+  color: var(--danger);
+}
+
+.alert-success {
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--accent-strong);
+}
+
+.empty {
+  border: 1px dashed var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 920px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

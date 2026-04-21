@@ -35,5 +35,6 @@ build_and_load() {
 build_and_load "hello-api:0.1.0" "src/hello-api"
 build_and_load "comments-api:0.1.0" "src/comments-api"
 build_and_load "api-docs-service:0.1.0" "src/api-docs-service"
+build_and_load "comments-ui:0.1.0" "src/comments-ui"
 
 echo "Custom images built and loaded into both clusters."
