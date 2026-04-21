@@ -10,6 +10,11 @@ argocd_target_revision="${ARGOCD_TARGET_REVISION:-master}"
 tmp_dir=$(mktemp -d)
 trap 'rm -rf "$tmp_dir"' EXIT
 
+context_exists() {
+  local context_name="$1"
+  kubectl config get-contexts "$context_name" >/dev/null 2>&1
+}
+
 escape_for_sed() {
   local value="$1"
   value=${value//\\/\\\\}
@@ -47,9 +52,18 @@ do
     "$tmp_dir/${application}-application.yaml"
 done
 
-kubectl apply --context kind-dev -f "$tmp_dir/dev-app-application.yaml"
-kubectl apply --context kind-dev -f "$tmp_dir/dev-db-application.yaml"
-kubectl apply --context kind-dev -f "$tmp_dir/dev-obs-application.yaml"
-kubectl apply --context kind-prod -f "$tmp_dir/prod-app-application.yaml"
-kubectl apply --context kind-prod -f "$tmp_dir/prod-db-application.yaml"
-kubectl apply --context kind-prod -f "$tmp_dir/prod-obs-application.yaml"
+if context_exists kind-dev; then
+  kubectl apply --context kind-dev -f "$tmp_dir/dev-app-application.yaml"
+  kubectl apply --context kind-dev -f "$tmp_dir/dev-db-application.yaml"
+  kubectl apply --context kind-dev -f "$tmp_dir/dev-obs-application.yaml"
+else
+  echo "Skipping kind-dev; context does not exist"
+fi
+
+if context_exists kind-prod; then
+  kubectl apply --context kind-prod -f "$tmp_dir/prod-app-application.yaml"
+  kubectl apply --context kind-prod -f "$tmp_dir/prod-db-application.yaml"
+  kubectl apply --context kind-prod -f "$tmp_dir/prod-obs-application.yaml"
+else
+  echo "Skipping kind-prod; context does not exist"
+fi

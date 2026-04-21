@@ -16,7 +16,17 @@ ssh_private_key=$(<"$ssh_key_path")
 
 clusters=(kind-dev kind-prod)
 
+context_exists() {
+  local context_name="$1"
+  kubectl config get-contexts "$context_name" >/dev/null 2>&1
+}
+
 for context in "${clusters[@]}"; do
+  if ! context_exists "$context"; then
+    echo "Skipping ${context}; context does not exist"
+    continue
+  fi
+
   kubectl create secret generic repo-k8s-clusters-ssh \
     --context "$context" \
     -n "$argocd_namespace" \

@@ -22,6 +22,8 @@ each cluster through Argo CD.
 - `build-custom-images.sh`: builds local custom images and loads them into both `kind` clusters
 - `manage-kind-cluster.sh`: delete, create, or recreate a single `kind` cluster
 - `port-forward-postgres.sh`: temporary local access to in-cluster PostgreSQL services for tools such as DBeaver
+- `install-chaos-mesh.sh`: installs Chaos Mesh into a target cluster, defaulting to `kind-dev`
+- `chaos/dev/*`: starter Chaos Mesh experiments for the stateless `dev` tier
 
 ## Prerequisites
 
@@ -159,6 +161,57 @@ Temporary PostgreSQL access for local tools such as DBeaver:
 ```
 
 Press `Ctrl+C` to stop the temporary access.
+
+## Chaos Mesh
+
+This repo treats Chaos Mesh as an in-cluster tool for fault injection. The
+recommended local workflow is to install it into `kind-dev` only and use it to
+test the stateless tier:
+
+- `kong`
+- `hello`
+- `comments`
+- `api-docs`
+- `comments-ui`
+- `alloy`
+
+Install Chaos Mesh into `dev`:
+
+```sh
+./install-chaos-mesh.sh kind-dev
+```
+
+Open the dashboard locally:
+
+```sh
+kubectl port-forward -n chaos-mesh --context kind-dev svc/chaos-dashboard 2333:2333
+```
+
+Then open:
+
+- `http://127.0.0.1:2333`
+
+Starter experiments:
+
+```sh
+kubectl apply --context kind-dev -f chaos/dev/pod-kill-kong.yaml
+kubectl apply --context kind-dev -f chaos/dev/pod-kill-hello.yaml
+kubectl apply --context kind-dev -f chaos/dev/pod-kill-comments.yaml
+kubectl apply --context kind-dev -f chaos/dev/pod-kill-api-docs.yaml
+kubectl apply --context kind-dev -f chaos/dev/pod-kill-comments-ui.yaml
+kubectl apply --context kind-dev -f chaos/dev/pod-kill-alloy.yaml
+kubectl apply --context kind-dev -f chaos/dev/network-delay-comments-ui-to-comments.yaml
+```
+
+These manifests require the Chaos Mesh CRDs to be installed first, so they will
+not validate or apply successfully until after `./install-chaos-mesh.sh kind-dev`
+has completed.
+
+Delete an experiment after testing:
+
+```sh
+kubectl delete --context kind-dev -f chaos/dev/pod-kill-comments.yaml
+```
 
 ## Notes
 

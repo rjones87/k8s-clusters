@@ -44,8 +44,16 @@ delete_cluster() {
   kind delete cluster --name "$cluster_name"
 }
 
+tune_cluster_node() {
+  local node_name="${cluster_name}-control-plane"
+
+  docker exec "$node_name" sysctl -w fs.inotify.max_user_instances=1024 >/dev/null
+  docker exec "$node_name" sysctl -w fs.inotify.max_user_watches=2097152 >/dev/null
+}
+
 create_cluster() {
   kind create cluster --name "$cluster_name" --config "$config_path"
+  tune_cluster_node
 }
 
 case "$action" in

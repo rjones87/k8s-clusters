@@ -7,7 +7,17 @@ argocd_install_url="${ARGOCD_INSTALL_URL:-https://raw.githubusercontent.com/argo
 
 clusters=(kind-dev kind-prod)
 
+context_exists() {
+  local context_name="$1"
+  kubectl config get-contexts "$context_name" >/dev/null 2>&1
+}
+
 for context in "${clusters[@]}"; do
+  if ! context_exists "$context"; then
+    echo "Skipping ${context}; context does not exist"
+    continue
+  fi
+
   case "$context" in
     kind-dev)
       argocd_node_port=30180

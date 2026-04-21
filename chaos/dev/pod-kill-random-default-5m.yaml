@@ -1,0 +1,12 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-random-default-5m
+  namespace: chaos-mesh
+spec:
+  action: pod-kill
+  mode: one
+  duration: "5m"
+  selector:
+    namespaces:
+      - default
