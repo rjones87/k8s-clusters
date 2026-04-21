@@ -1,0 +1,18 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-random-hello-or-comments-5m
+  namespace: chaos-mesh
+spec:
+  action: pod-kill
+  mode: one
+  duration: "5m"
+  selector:
+    namespaces:
+      - default
+    expressionSelectors:
+      - key: app
+        operator: In
+        values:
+          - hello-dev
+          - comments-dev
