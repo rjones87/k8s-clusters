@@ -328,13 +328,32 @@ app.get("/metrics", async (_req, res) => {
   res.end(await client.register.metrics());
 });
 
-app.use((error, _req, res, _next) => {
+app.use((error, req, res, _next) => {
+  if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
+    console.error(
+      JSON.stringify({
+        level: "warn",
+        service: serviceName,
+        env: environment,
+        kongRequestId: req.get("x-kong-request-id") || null,
+        message: "invalid json request body",
+        error: error.message,
+      }),
+    );
+
+    res.status(400).json({
+      error: "invalid JSON request body",
+      details: error.message,
+    });
+    return;
+  }
+
   console.error(
     JSON.stringify({
       level: "error",
       service: serviceName,
       env: environment,
-      kongRequestId: _req.get("x-kong-request-id") || null,
+      kongRequestId: req.get("x-kong-request-id") || null,
       message: "request failed",
       error: error.message,
     }),

@@ -21,6 +21,7 @@ each cluster through Argo CD.
 - `deploy-hello-apps.sh`: renders and applies the `Application` resources
 - `build-custom-images.sh`: builds local custom images and loads them into both `kind` clusters
 - `manage-kind-cluster.sh`: delete, create, or recreate a single `kind` cluster
+- `port-forward-postgres.sh`: temporary local access to in-cluster PostgreSQL services for tools such as DBeaver
 
 ## Prerequisites
 
@@ -148,6 +149,16 @@ Access Grafana locally:
 - `http://127.0.0.1:30280` for `dev`
 - `http://127.0.0.1:30290` for `prod`
 - default login: `admin` / `admin`
+
+Temporary PostgreSQL access for local tools such as DBeaver:
+
+```sh
+./port-forward-postgres.sh dev app
+./port-forward-postgres.sh dev comments
+./port-forward-postgres.sh dev all
+```
+
+Press `Ctrl+C` to stop the temporary access.
 
 ## Notes
 
