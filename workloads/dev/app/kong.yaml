@@ -21,6 +21,13 @@ data:
             paths:
               - /nginx
             strip_path: true
+      - name: comments-dev-service
+        url: http://comments-dev.default.svc.cluster.local:80/comments
+        routes:
+          - name: comments-dev-route
+            paths:
+              - /api/comments
+            strip_path: true
 ---
 apiVersion: apps/v1
 kind: Deployment

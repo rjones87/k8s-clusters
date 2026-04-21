@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: comments-postgres-dev
+  namespace: default
+type: Opaque
+stringData:
+  password: commentsdevpassword
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: comments-postgres-dev
+  namespace: default
+spec:
+  selector:
+    app: comments-postgres-dev
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: comments-postgres-dev
+  namespace: default
+spec:
+  serviceName: comments-postgres-dev
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comments-postgres-dev
+  template:
+    metadata:
+      labels:
+        app: comments-postgres-dev
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16.13-alpine
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              value: comments
+            - name: POSTGRES_USER
+              value: commentsuser
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: comments-postgres-dev
+                  key: password
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

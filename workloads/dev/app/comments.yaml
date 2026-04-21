@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comments-dev
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comments-dev
+  template:
+    metadata:
+      labels:
+        app: comments-dev
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "3000"
+    spec:
+      containers:
+        - name: comments
+          image: comments-api:0.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "3000"
+            - name: APP_ENV
+              value: "dev"
+            - name: SERVICE_NAME
+              value: "comments-dev"
+            - name: DB_HOST
+              value: "comments-postgres-dev"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "comments"
+            - name: DB_USER
+              value: "commentsuser"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: comments-postgres-dev
+                  key: password
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: comments-dev
+  namespace: default
+spec:
+  selector:
+    app: comments-dev
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  type: ClusterIP

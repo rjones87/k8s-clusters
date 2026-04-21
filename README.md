@@ -130,8 +130,10 @@ kubectl get statefulset,pvc --context kind-prod
 Access the services locally through Kong:
 
 - `http://127.0.0.1:30080/api/hello` for the `dev` hello service
+- `http://127.0.0.1:30080/api/comments` for the `dev` comments service
 - `http://127.0.0.1:30080/nginx` for the `dev` nginx service
 - `http://127.0.0.1:30090/api/hello` for the `prod` hello service
+- `http://127.0.0.1:30090/api/comments` for the `prod` comments service
 - `http://127.0.0.1:30090/nginx` for the `prod` nginx service
 
 Access the Argo CD UIs locally:
@@ -149,6 +151,9 @@ Access Grafana locally:
 
 - `src/hello-api` is the reference custom service. It is a Node.js + Express app
   with `/hello`, `/health`, and `/metrics`.
+- `src/comments-api` is a Node.js + Express CRUD service backed by a dedicated
+  PostgreSQL instance per environment. It creates its own table if needed and
+  exposes CRUD and latency metrics for comment operations.
 - Custom services should prefix all Prometheus metrics with their service name so
   they are easy to identify in Grafana and Prometheus.
 - Health checks are tracked separately from normal API traffic, including a
