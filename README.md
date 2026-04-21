@@ -20,6 +20,7 @@ each cluster through Argo CD.
 - `install-argocd.sh`: installs Argo CD into both clusters
 - `deploy-hello-apps.sh`: renders and applies the `Application` resources
 - `build-custom-images.sh`: builds local custom images and loads them into both `kind` clusters
+- `manage-kind-cluster.sh`: delete, create, or recreate a single `kind` cluster
 
 ## Prerequisites
 
@@ -35,6 +36,20 @@ each cluster through Argo CD.
 kind create cluster --name dev --config kind-dev.yaml
 kind create cluster --name prod --config kind-prod.yaml
 ```
+
+If you want to work on only one cluster at a time, use the single-cluster helper:
+
+```sh
+./manage-kind-cluster.sh delete prod
+./manage-kind-cluster.sh create prod
+./manage-kind-cluster.sh recreate dev
+```
+
+The helper only manages the selected cluster. The existing scripts
+`install-argocd.sh`, `bootstrap-argocd-repo-creds.sh`, `build-custom-images.sh`,
+and `deploy-hello-apps.sh` still assume both `kind-dev` and `kind-prod` exist.
+If you delete `prod`, avoid running those dual-cluster scripts until `prod` is
+created again.
 
 ## 2. Install Argo CD into each cluster
 
@@ -140,6 +155,14 @@ Access Grafana locally:
   dedicated `*_healthcheck_up` gauge and `*_healthcheck_requests_total` counter.
 - `build-custom-images.sh` must be run after cluster creation and before syncing
   custom-image workloads so `kind` can serve those images locally.
+- Rebuilding a single cluster is straightforward:
+  1. `./manage-kind-cluster.sh recreate <dev|prod>`
+  2. `./install-argocd.sh`
+  3. `./bootstrap-argocd-repo-creds.sh`
+  4. `./build-custom-images.sh`
+  5. `./deploy-hello-apps.sh`
+- Deleting only `prod` is safe for day-to-day work on `dev`, but the current
+  bootstrap/deploy scripts are not yet single-cluster aware.
 - Alloy ships pod logs to Loki, so services only need to log to `stdout`.
 - Alloy relabels Kubernetes metadata into Loki labels, so Grafana log queries can
   filter by labels such as `namespace`, `pod`, `container`, `node`, and `app`.
