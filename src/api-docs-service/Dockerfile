@@ -6,6 +6,7 @@ COPY package.json ./
 RUN npm install --omit=dev
 
 COPY server.js ./
+COPY tracing.js ./
 COPY openapi.json ./
 
 ENV PORT=3000

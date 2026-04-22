@@ -1,3 +1,6 @@
+const { currentTraceFields, startTracing } = require("./tracing");
+startTracing();
+
 const express = require("express");
 const client = require("prom-client");
 const swaggerUi = require("swagger-ui-express");
@@ -35,6 +38,8 @@ app.use((req, res, next) => {
   const kongRequestId = req.get("x-kong-request-id") || null;
 
   res.on("finish", () => {
+    const traceFields = currentTraceFields();
+
     if (req.path === "/health") {
       healthcheckRequestsTotal.inc({
         method: req.method,
@@ -59,6 +64,8 @@ app.use((req, res, next) => {
         statusCode: res.statusCode,
         durationMs: Date.now() - startedAt,
         kongRequestId,
+        traceId: traceFields.traceId,
+        spanId: traceFields.spanId,
         message: "request completed",
       }),
     );
@@ -99,6 +106,8 @@ app.listen(port, () => {
       service: serviceName,
       env: environment,
       port,
+      traceId: null,
+      spanId: null,
       message: "service started",
     }),
   );

@@ -8,11 +8,18 @@ data:
     apiVersion: 1
     datasources:
       - name: Prometheus
+        uid: prometheus
         type: prometheus
         access: proxy
         url: http://prometheus.observability.svc.cluster.local:9090
         isDefault: true
+      - name: Tempo
+        uid: tempo
+        type: tempo
+        access: proxy
+        url: http://tempo.observability.svc.cluster.local:3200
       - name: Loki
+        uid: loki
         type: loki
         access: proxy
         url: http://loki.observability.svc.cluster.local:3100
@@ -23,6 +30,8 @@ metadata:
   name: grafana
   namespace: observability
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:

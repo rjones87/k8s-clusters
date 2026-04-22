@@ -23,13 +23,14 @@ Every new service added under `src/` should follow these rules:
 4. Log to `stdout` and `stderr` so Alloy can ship logs to Loki.
 5. Add Prometheus pod annotations so the in-cluster Prometheus instance can scrape metrics.
 6. Prefix every metric name with a service-specific prefix.
-7. Add a Kubernetes `Deployment` and `Service` in both:
+7. Export OpenTelemetry traces to the in-cluster Tempo instance.
+8. Add a Kubernetes `Deployment` and `Service` in both:
    - `workloads/dev/app/`
    - `workloads/prod/app/`
-8. Add a Kong route in both:
+9. Add a Kong route in both:
    - `workloads/dev/app/kong.yaml`
    - `workloads/prod/app/kong.yaml`
-9. If the service changes a public API exposed through Kong, update the OpenAPI
+10. If the service changes a public API exposed through Kong, update the OpenAPI
    document in `src/api-docs-service/openapi.json` so `/docs/api` stays current.
 
 ## Directory template
@@ -90,6 +91,9 @@ Example:
 
 - Logs: Alloy already collects pod logs from Kubernetes and pushes them to Loki.
 - Metrics: Prometheus scrapes annotated pods, and Grafana can query Prometheus.
+- Traces: custom Node services should export OTLP traces to Tempo and include
+  `traceId` / `spanId` in their structured logs so traces and logs can be
+  correlated even when Grafana datasource cross-links are disabled.
 - Metric names should be prefixed with the service name. For example, a service
   named `orders-api` should emit metrics such as:
   - `orders_api_requests_total`
@@ -102,6 +106,8 @@ Example:
 - Service request logs should include the inbound `X-Kong-Request-Id` header
   when present so a single request can be traced in Grafana/Loki from the
   gateway to the upstream service.
+- Service request logs should also include `traceId` and `spanId` so operators
+  can correlate Loki log lines with Tempo traces.
 
 Every new service should follow the same metric pattern used by
 `src/hello-api/`:

@@ -6,6 +6,7 @@ COPY package.json ./
 RUN npm install --omit=dev
 
 COPY server.js ./
+COPY tracing.js ./
 COPY next.config.mjs ./
 COPY app ./app
 

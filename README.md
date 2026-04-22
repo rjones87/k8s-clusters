@@ -50,9 +50,8 @@ If you want to work on only one cluster at a time, use the single-cluster helper
 
 The helper only manages the selected cluster. The existing scripts
 `install-argocd.sh`, `bootstrap-argocd-repo-creds.sh`, `build-custom-images.sh`,
-and `deploy-hello-apps.sh` still assume both `kind-dev` and `kind-prod` exist.
-If you delete `prod`, avoid running those dual-cluster scripts until `prod` is
-created again.
+and `deploy-hello-apps.sh` now skip missing contexts, so you can work on a
+single cluster without recreating the other one first.
 
 ## 2. Install Argo CD into each cluster
 
@@ -152,6 +151,17 @@ Access Grafana locally:
 - `http://127.0.0.1:30290` for `prod`
 - default login: `admin` / `admin`
 
+Grafana is provisioned with:
+
+- `Prometheus` for metrics
+- `Loki` for logs
+- `Tempo` for traces
+
+The Loki-to-Tempo clickthrough is intentionally not provisioned right now.
+Grafana 12.4.2 failed startup when the datasource config referenced other
+datasources during provisioning, so traces and logs are available as separate
+datasources until a safer correlation setup is added.
+
 Temporary PostgreSQL access for local tools such as DBeaver:
 
 ```sh
@@ -227,7 +237,13 @@ kubectl delete --context kind-dev -f chaos/dev/pod-kill-comments.yaml
 - Health checks are tracked separately from normal API traffic, including a
   dedicated `*_healthcheck_up` gauge and `*_healthcheck_requests_total` counter.
 - `build-custom-images.sh` must be run after cluster creation and before syncing
-  custom-image workloads so `kind` can serve those images locally.
+  custom-image workloads so `kind` can serve those images locally. The script
+  now also restarts the custom app deployments in any existing cluster contexts
+  so rebuilt local images are picked up immediately.
+- The observability stack includes Tempo, and the custom Node services export
+  OTLP traces directly to `http://tempo.observability.svc.cluster.local:4318`.
+- Service logs now include `traceId` and `spanId`, which is enough to correlate
+  logs and traces manually while Grafana datasource cross-links remain disabled.
 - Rebuilding a single cluster is straightforward:
   1. `./manage-kind-cluster.sh recreate <dev|prod>`
   2. `./install-argocd.sh`
